@@ -1,22 +1,22 @@
 <div align="center">
 
-    <picture>
-      <img src="docs/assets/claimlightning_logo.png" alt="ClaimLightning Logo" width="80%"/>
-    </picture>
+<picture>
+  <img src="docs/assets/claimlightning_logo.png" alt="ClaimLightning Logo" width="80%"/>
+</picture>
 
-    *Production-ready AI-Powered Claim Processing Agent for Next-Gen Insurance Workflows*
+*Production-ready AI-Powered Claim Processing Agent for Next-Gen Insurance Workflows*
 
-    **Automate, accelerate, and secure claim processing with GPT-5 intelligence.**
+**Automate, accelerate, and secure claim processing with GPT-5 intelligence.**
 
-    [![CI](https://github.com/YOUR_GITHUB/ClaimLightning/actions/workflows/main.yml/badge.svg)](https://github.com/YOUR_GITHUB/ClaimLightning/actions/workflows/main.yml)
-    [![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://YOUR_GITHUB.github.io/ClaimLightning/)
-    [![Python Version](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/downloads/)
-    [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![CI](https://github.com/YOUR_GITHUB/ClaimLightning/actions/workflows/main.yml/badge.svg)](https://github.com/YOUR_GITHUB/ClaimLightning/actions/workflows/main.yml)
+[![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://YOUR_GITHUB.github.io/ClaimLightning/)
+[![Python Version](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/downloads/)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-    [Installation](#quick-start) •
-    [Documentation](https://YOUR_GITHUB.github.io/ClaimLightning/) •
-    [Examples](#examples) •
-    [Contributing](CONTRIBUTING.md)
+[Installation](#quick-start) •
+[Documentation](https://YOUR_GITHUB.github.io/ClaimLightning/) •
+[Examples](#examples) •
+[Contributing](CONTRIBUTING.md)
 
 </div>
 
