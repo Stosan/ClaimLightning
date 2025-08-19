@@ -11,7 +11,9 @@ class EnvConfig:
         self.app_port = os.getenv("PORT")
         self.x_api_key = os.getenv("X-API-KEY")
         self.aimlapi_key = os.getenv("AIMLAPI-KEY")
-        
+        self.mongo_conn_url =os.getenv("DB_CONN_URL")
+        self.mongo_database_name= os.getenv("DB_DBNAME")
+
     def __repr__(self):
         return (
             f"EnvConfig(env={self.env}, app_port={self.app_port}, "

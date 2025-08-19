@@ -1,8 +1,8 @@
 import asyncio
 from typing import Optional
 from uuid import uuid4
-from fastapi import APIRouter, Header, status
-from src.ai_model.aimlapi import ConversationManager
+from fastapi import APIRouter, Header, Request, status
+from src.domain.process_claim import ProcessClaim
 from src.application.datamodels import *
 from src.config.app_settings import get_settings
 from fastapi.responses import JSONResponse
@@ -40,15 +40,17 @@ async def customer_login(customer_login_payload: CustomerLoginPayload, x_api_key
 
 
 @claim_router.post("/process-claim",response_model=ClaimApplicationResponse)
-async def claim_processing(claim_application_payload: ClaimApplicationPayload, x_api_key: Optional[str] = Header(None, alias="X-API-KEY")):
+async def claim_processing(request: Request,claim_application_payload: ClaimApplicationPayload, x_api_key: Optional[str] = Header(None, alias="X-API-KEY")):
     if x_api_key != env_config.x_api_key:
         # Return an unauthorized error response
         return JSONResponse(status_code=401, content={"message": "Unauthorized access: Invalid API key"})
     try:
+        db_client = request.app.state.db_client
         print(claim_application_payload)
-        conversationManager = ConversationManager()
-        conversationManager.llm_call(claim_application_payload.message,claim_application_payload.policyNumber)
-        claimApplicationResponse = ClaimApplicationResponse()
+        processClaim=ProcessClaim()
+        result = processClaim.run_claim_processing(claim_application_payload)
+        print(result)
+        claimApplicationResponse = ClaimApplicationResponse(aiMessage=result)
         return JSONResponse(content=claimApplicationResponse.model_dump(),status_code=claimApplicationResponse.status)
     except Exception as e:
         # Log the error

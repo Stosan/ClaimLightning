@@ -6,6 +6,7 @@ from fastapi import FastAPI, Request, Depends, HTTPException
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, JSONResponse
+from src.infrastructure.database.mongo import MongoDBClientConfig
 from src.config.app_settings import Settings, get_settings
 from contextlib import asynccontextmanager
 from starlette.middleware.httpsredirect import HTTPSRedirectMiddleware
@@ -29,6 +30,8 @@ async def lifespan(app: FastAPI):
     This function initializes and cleans up resources during the application's lifecycle.
     """
     # STARTUP Call Check routine
+    mongo_client = MongoDBClientConfig()
+    app.state.db_client = mongo_client
     print(running_mode)
     print()
     print()
@@ -37,6 +40,10 @@ async def lifespan(app: FastAPI):
     printer(" ⚡️🏎  Reinsurance AI Server::Running", "sky_blue")
     yield
     printer(" 🔴 Reinsurance AI Server::SHUTDOWN", "red")
+
+# Adjust dependency to use warmed db_client
+def get_db_client(settings: Settings = Depends(get_settings)):
+    return app.state.db_client
 
 # Create FastAPI app instance
 app = FastAPI(
@@ -94,7 +101,7 @@ async def claim_application(request: Request,):
     return templates.TemplateResponse(request=request,name="claim.html",context={})
 
 app.include_router(claim_router,prefix=settings.API_V1_STR,  
-                   tags=["AUTH"],dependencies=[ Depends(get_settings),],)
+                   tags=["AUTH"],dependencies=[  Depends(get_db_client),Depends(get_settings),],)
 
 
 if __name__ == "__main__":
