@@ -18,7 +18,7 @@
     [Examples](#examples) •
     [Contributing](CONTRIBUTING.md)
 
-    </div>
+</div>
 
     ## 📖 Overview
 
