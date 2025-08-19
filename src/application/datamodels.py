@@ -9,6 +9,8 @@ class CustomerLoginPayload(BaseModel):
 # Model for customer login response
 class CustomerLoginResponse(BaseModel):
     status: int = Field(default=200)  # HTTP status code
+    token:str
+    policyNumber: str
     message: str = Field(default="success!")  # Response message
 
 # Model for claim application payload

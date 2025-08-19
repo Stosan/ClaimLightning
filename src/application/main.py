@@ -18,7 +18,7 @@ settings = get_settings()
 
 # Description for API documentation
 description = f"""
-{settings.API_STR} helps you do awesome stuff. 🚀
+{settings.API_V1_STR} helps you do awesome stuff. 🚀
 """
 
 # Define a context manager for the application lifespan
@@ -40,9 +40,9 @@ async def lifespan(app: FastAPI):
 
 # Create FastAPI app instance
 app = FastAPI(
-    title=settings.PROJECT_NAME,
+    title=settings.APP_NAME,
     description=description,
-    openapi_url=f"{settings.API_STR}/openapi.json",
+    openapi_url=f"{settings.API_V1_STR}/openapi.json",
     license_info={
         "name": "Apache 2.0",
         "url": "https://www.apache.org/licenses/LICENSE-2.0.html",
@@ -55,14 +55,14 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/static", StaticFiles(directory="src/static"), name="static")
 
 
-templates = Jinja2Templates(directory="templates")
+templates = Jinja2Templates(directory="src/templates")
 
 # Configure for development or production mode
-if env_config.environment in ["development", "staging"]:
-    running_mode = f"  👩‍💻 🛠️  Running in::{env_config.environment} mode"
+if env_config.env in ["development", "staging"]:
+    running_mode = f"  👩‍💻 🛠️  Running in::{env_config.env} mode"
 else:
     # app.add_middleware(HTTPSRedirectMiddleware)
     running_mode = "  🏭 ☁  Running in::production mode"
@@ -86,14 +86,14 @@ app.add_middleware(
 )
 
 @app.get("/", response_class=HTMLResponse)
-async def read_item(request: Request, id: str):
-    return templates.TemplateResponse(
-        request=request, name="item.html", context={"id": id}
-    )
+async def home(request: Request,):
+    return templates.TemplateResponse(request=request,name="index.html",context={})
 
+@app.get("/claim-application", response_class=HTMLResponse)
+async def claim_application(request: Request,):
+    return templates.TemplateResponse(request=request,name="claim.html",context={})
 
-
-app.include_router(claim_router,prefix=settings.API_STR,  
+app.include_router(claim_router,prefix=settings.API_V1_STR,  
                    tags=["AUTH"],dependencies=[ Depends(get_settings),],)
 
 

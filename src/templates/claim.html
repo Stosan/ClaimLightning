@@ -1,0 +1,272 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ClaimLightning — Claims</title>
+  <meta name="color-scheme" content="light dark" />
+  <style>
+    :root{
+      --bg:#0f172a;           /* slate-900 */
+      --surface:#0b1220;      /* deep surface */
+      --card:#111827;         /* gray-900 */
+      --text:#e5e7eb;         /* gray-200 */
+      --muted:#94a3b8;        /* slate-400 */
+      --outline:#334155;      /* slate-700 */
+      --primary:#6750A4;      /* Material3 */
+      --primary-variant:#7f67be;
+      --success:#22c55e;      /* green-500 */
+      --error:#ef4444;        /* red-500 */
+      --radius:16px;
+      --shadow:0 10px 30px rgba(0,0,0,.35),0 2px 8px rgba(0,0,0,.3);
+      --sidebar-w:320px;
+    }
+    @media (prefers-color-scheme: light){
+      :root{
+        --bg:#f6f7fb; --surface:#fff; --card:#fff; --text:#0b1020; --muted:#5f6b7a; --outline:#e5e7eb; --shadow:0 18px 35px rgba(17,24,39,.08),0 6px 12px rgba(17,24,39,.06);
+      }
+    }
+    html,body{height:100%;margin:0;background:radial-gradient(1200px 600px at 5% 0%, rgba(103,80,164,.15), transparent 60%),radial-gradient(900px 500px at 100% 10%, rgba(127,103,190,.12), transparent 60%),var(--bg);color:var(--text);font-family:ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Noto Sans", "Helvetica Neue", Arial;}
+    .app{display:grid;grid-template-rows:auto 1fr; height:100%;}
+    .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;border-bottom:1px solid var(--outline);backdrop-filter:saturate(140%) blur(8px);background:linear-gradient(180deg, color-mix(in oklab, var(--card) 88%, transparent), color-mix(in oklab, var(--surface) 92%, transparent));position:sticky;top:0;z-index:10}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{width:28px;height:28px;border-radius:8px;background:conic-gradient(from 210deg,#7f67be,#6750A4,#9b87f5,#7f67be);position:relative;box-shadow:0 6px 16px rgba(103,80,164,.35), inset 0 0 0 1px rgba(255,255,255,.08)}
+    .logo:after{content:"";position:absolute;inset:6px 7px 6px 10px;background:linear-gradient(180deg,#fff,#e2e8f0);clip-path:polygon(60% 0%, 40% 40%, 70% 40%, 35% 100%, 45% 55%, 20% 55%)}
+    .top-actions{display:flex;align-items:center;gap:10px}
+    .chip{font-size:.85rem;color:var(--muted);border:1px solid var(--outline);padding:6px 10px;border-radius:999px}
+    .btn{border:0;border-radius:12px;background:linear-gradient(180deg,var(--primary),var(--primary-variant));color:#fff;padding:10px 14px;font-weight:600;box-shadow:0 8px 18px rgba(103,80,164,.35);cursor:pointer}
+
+    .main{display:grid;grid-template-columns:1fr var(--sidebar-w); gap:16px; height:calc(100vh - 62px); padding:16px}
+    @media (max-width: 980px){ .main{grid-template-columns:1fr} .sidebar{order:-1; height:280px} }
+
+    /* Chat panel */
+    .chat-card{height:100%;display:grid;grid-template-rows:1fr auto; background:linear-gradient(180deg,var(--card),var(--surface));border:1px solid var(--outline);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+    .messages{padding:16px; overflow:auto; display:flex; flex-direction:column; gap:10px; scroll-behavior:smooth}
+    .msg{max-width:min(72ch, 80%); padding:10px 12px; border:1px solid var(--outline); border-radius:14px; background:color-mix(in oklab, var(--surface) 95%, transparent);}
+    .msg.user{align-self:flex-end; background:color-mix(in oklab, var(--primary) 12%, var(--surface)); border-color:color-mix(in oklab, var(--primary) 35%, var(--outline))}
+    .msg.agent{align-self:flex-start}
+    .stamp{display:block; color:var(--muted); font-size:.75rem; margin-top:4px}
+
+    /* Composer */
+    .composer-wrap{border-top:1px solid var(--outline); background:linear-gradient(180deg, color-mix(in oklab, var(--surface) 96%, transparent), var(--surface)); padding:12px}
+    .composer{display:flex; align-items:center; gap:10px; background:color-mix(in oklab, var(--surface) 96%, transparent); border:1px solid var(--outline); border-radius:999px; padding:6px 8px 6px 8px}
+    .icon-btn{display:inline-grid; place-items:center; width:40px; height:40px; border-radius:999px; border:0; background:transparent; color:var(--muted); cursor:pointer}
+    .icon-btn:focus-visible{outline:2px solid color-mix(in oklab, var(--primary) 60%, transparent)}
+    .input{flex:1; min-height:44px; border:0; outline:none; background:transparent; color:var(--text); font-size:1rem; padding:8px}
+    .send{width:44px; height:44px; border-radius:999px; border:0; display:grid; place-items:center; background:linear-gradient(180deg,var(--primary),var(--primary-variant)); color:#fff; cursor:pointer; box-shadow:0 8px 18px rgba(103,80,164,.35)}
+
+    /* Sidebar */
+    .sidebar{background:linear-gradient(180deg,var(--card),var(--surface)); border:1px solid var(--outline); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; display:flex; flex-direction:column}
+    .side-head{display:flex; align-items:center; justify-content:space-between; padding:12px 14px; border-bottom:1px solid var(--outline)}
+    .side-title{font-weight:600; font-size:.98rem}
+    .file-list{flex:1; overflow:auto; display:grid; gap:8px; padding:12px}
+    .file{display:grid; grid-template-columns:40px 1fr auto; gap:10px; align-items:center; padding:8px; border:1px solid var(--outline); border-radius:12px; background:color-mix(in oklab, var(--surface) 95%, transparent)}
+    .thumb{width:40px; height:40px; border-radius:8px; background:#0d1526; display:grid; place-items:center; overflow:hidden}
+    .file-name{white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+    .progress{height:6px; border-radius:999px; background:color-mix(in oklab, var(--outline) 60%, transparent); overflow:hidden}
+    .bar{height:100%; width:0%; background:linear-gradient(90deg,var(--primary),var(--primary-variant))}
+    .hidden{display:none}
+
+    .drop{margin:12px; border:1.5px dashed color-mix(in oklab, var(--primary) 50%, var(--outline)); border-radius:14px; padding:12px; text-align:center; color:var(--muted)}
+    .drop.drag{background:color-mix(in oklab, var(--primary) 8%, transparent)}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <div style="font-weight:700">ClaimLightning</div>
+          <div class="chip" id="policy-chip">Policy: <span id="policy-id">—</span></div>
+        </div>
+      </div>
+      <div class="top-actions">
+        <button class="btn" id="logout">Logout</button>
+      </div>
+    </header>
+
+    <main class="main">
+      <!-- Chat Area -->
+      <section class="chat-card" aria-label="Chat with Claim Assistant">
+        <div id="messages" class="messages" role="log" aria-live="polite" aria-relevant="additions"></div>
+        <div class="composer-wrap">
+          <div class="composer">
+            <button class="icon-btn" id="attach" title="Attach documents" aria-label="Attach documents">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-8.49 8.49a5 5 0 0 1-7.07-7.07l9.19-9.19a3.5 3.5 0 0 1 4.95 4.95l-9.19 9.19a2 2 0 1 1-2.83-2.83l8.49-8.49"/></svg>
+            </button>
+            <input id="file-input" type="file" class="hidden" multiple accept="image/*,.pdf,.doc,.docx,.png,.jpg,.jpeg" />
+            <input id="composer" class="input" type="text" placeholder="Describe your claim or ask a question…" autocomplete="off" />
+            <button class="send" id="send" title="Send" aria-label="Send message">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Sidebar -->
+      <aside class="sidebar" aria-label="Uploaded documents">
+        <div class="side-head">
+          <div class="side-title">Documents</div>
+          <label class="btn" style="padding:8px 10px; font-size:.9rem;" for="file-input">Upload</label>
+        </div>
+        <div id="drop" class="drop">Drag & drop files here or use Upload</div>
+        <div id="file-list" class="file-list"></div>
+      </aside>
+    </main>
+  </div>
+
+  <script>
+    // --- Auth guard ---
+    const token = sessionStorage.getItem('cl_token');
+    if (!token) {
+      // no token? redirect to login page
+      window.location.replace('/');
+    }
+
+    // --- Elements ---
+    const messagesEl = document.getElementById('messages');
+    const composerEl = document.getElementById('composer');
+    const sendBtn = document.getElementById('send');
+    const attachBtn = document.getElementById('attach');
+    const fileInput = document.getElementById('file-input');
+    const fileList = document.getElementById('file-list');
+    const drop = document.getElementById('drop');
+    const policyChip = document.getElementById('policy-id');
+
+    const storedPolicy = sessionStorage.getItem('cl_policy');
+    console.log(storedPolicy);
+    try{
+      const storedPolicy = sessionStorage.getItem('cl_policy');
+      if (storedPolicy) policyChip.textContent = storedPolicy; else policyChip.textContent = 'Active';
+    }catch(_){ policyChip.textContent = 'Active'; }
+
+    function fmtTime(){
+      const d = new Date();
+      return d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    }
+
+    function addMessage(text, who='user'){
+      const bubble = document.createElement('div');
+      bubble.className = `msg ${who}`;
+      bubble.innerHTML = `${escapeHtml(text)}<span class="stamp">${who==='user'?'You':'Assistant'} · ${fmtTime()}</span>`;
+      messagesEl.appendChild(bubble);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    function escapeHtml(s){
+      return s.replace(/[&<>\"']/g, (c)=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+    }
+
+    async function sendMessage(){
+      const text = composerEl.value.trim();
+      if (!text) return;
+      addMessage(text, 'user');
+      composerEl.value = '';
+
+      try{
+        const res = await fetch('http://127.0.0.1:8000/api/v1/process-claim',{
+          method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`,'X-API-KEY': 'blemisshes'}, body:JSON.stringify({message:text,policyNumber:storedPolicy})
+        });
+        if(res.ok){
+          const data = await res.json().catch(()=>({reply:"Received."}));
+          addMessage(data.reply || '✅ Message received. An agent will respond.','agent');
+        }else{
+          addMessage(`Server responded ${res.status}.`, 'agent');
+        }
+      }catch(err){
+        console.error(err);
+        addMessage('Network error. Unable to reach server right now.','agent');
+      }
+    }
+
+    sendBtn.addEventListener('click', sendMessage);
+    composerEl.addEventListener('keydown', (e)=>{
+      if (e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); sendMessage(); }
+    });
+
+    attachBtn.addEventListener('click', ()=> fileInput.click());
+    fileInput.addEventListener('change', ()=> handleFiles(fileInput.files));
+
+    // Drag & Drop
+    ;['dragenter','dragover'].forEach(evt=> drop.addEventListener(evt, (e)=>{ e.preventDefault(); e.stopPropagation(); drop.classList.add('drag'); }));
+    ;['dragleave','drop'].forEach(evt=> drop.addEventListener(evt, (e)=>{ e.preventDefault(); e.stopPropagation(); drop.classList.remove('drag'); }));
+    drop.addEventListener('drop', (e)=>{
+      const files = e.dataTransfer.files; if (files && files.length) handleFiles(files);
+    });
+
+    function mkFileRow(name, url){
+      const row = document.createElement('div');
+      row.className = 'file';
+
+      const thumb = document.createElement('div');
+      thumb.className = 'thumb';
+      const ext = name.split('.').pop().toLowerCase();
+      if(['png','jpg','jpeg','gif','webp'].includes(ext) && url){
+        const img = document.createElement('img');
+        img.src = url; img.alt = name; img.style.maxWidth = '100%'; img.style.maxHeight = '100%';
+        thumb.appendChild(img);
+      } else {
+        thumb.innerHTML = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>'
+      }
+
+      const meta = document.createElement('div');
+      const nameEl = document.createElement('div'); nameEl.className='file-name'; nameEl.textContent = name;
+      const prog = document.createElement('div'); prog.className='progress'; const bar = document.createElement('div'); bar.className='bar'; prog.appendChild(bar);
+      meta.appendChild(nameEl); meta.appendChild(prog);
+
+      const openBtn = document.createElement('a'); openBtn.textContent='Open'; openBtn.href = url || '#'; openBtn.target='_blank'; openBtn.style.textDecoration='none'; openBtn.className='chip';
+
+      row.appendChild(thumb); row.appendChild(meta); row.appendChild(openBtn);
+      return {row, bar, openBtn};
+    }
+
+    async function handleFiles(fileListLike){
+      const arr = Array.from(fileListLike);
+      for (const file of arr){
+        const url = URL.createObjectURL(file);
+        const {row, bar, openBtn} = mkFileRow(file.name, url);
+        fileList.prepend(row);
+
+        try{
+          const fd = new FormData(); fd.append('file', file);
+          const res = await uploadWithProgress('/claims/uploads', fd, (p)=>{ bar.style.width = p + '%'; });
+          if(res.ok){
+            bar.style.width = '100%';
+            bar.parentElement.title = 'Uploaded';
+            const data = await res.json().catch(()=>({url:null}));
+            if (data.url) openBtn.href = data.url;
+            addMessage(`📎 Uploaded: ${file.name}`, 'agent');
+          } else {
+            bar.style.background = 'linear-gradient(90deg, var(--error), #b91c1c)';
+            addMessage(`Upload failed (${res.status}) for ${file.name}`, 'agent');
+          }
+        }catch(err){
+          console.error(err);
+          bar.style.background = 'linear-gradient(90deg, var(--error), #b91c1c)';
+          addMessage(`Network error while uploading ${file.name}`, 'agent');
+        }
+      }
+    }
+
+    function uploadWithProgress(url, formData, onProgress){
+      return new Promise((resolve, reject)=>{
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', url);
+        xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+        xhr.upload.onprogress = (e)=>{ if(e.lengthComputable){ const p = Math.round((e.loaded/e.total)*100); onProgress(p); } };
+        xhr.onload = ()=> resolve({ ok: xhr.status>=200 && xhr.status<300, status:xhr.status, json: async()=>{ try{return JSON.parse(xhr.responseText)}catch(_){return {}} } });
+        xhr.onerror = ()=> reject(new Error('XHR failed'));
+        xhr.send(formData);
+      });
+    }
+
+    // Seed greeting
+    addMessage('Welcome to ClaimLightning. Upload photos, receipts, or medical reports on the right, then describe your claim below. I\'ll extract details and draft your application.','agent');
+
+    // Logout
+    document.getElementById('logout').addEventListener('click', ()=>{ sessionStorage.removeItem('cl_token'); window.location.replace('/'); });
+  </script>
+</body>
+</html>
