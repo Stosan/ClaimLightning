@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ClaimLightning Admin Portal</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --surface: #1e293b;
+      --card: #334155;
+      --sidebar-bg: #0b1220;
+      --text: #e2e8f0;
+      --text-muted: #94a3b8;
+      --primary: #6750A4;
+      --primary-light: #7f67be;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --border: #475569;
+      --shadow: 0 10px 30px rgba(0,0,0,.4);
+      --sidebar-width: 280px;
+      --topbar-height: 70px;
+      --radius: 12px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .dashboard {
+      display: grid;
+      grid-template-areas: 
+        "sidebar topbar"
+        "sidebar main";
+      grid-template-columns: var(--sidebar-width) 1fr;
+      grid-template-rows: var(--topbar-height) 1fr;
+      height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      grid-area: sidebar;
+      background: linear-gradient(180deg, var(--sidebar-bg), #111827);
+      border-right: 1px solid var(--border);
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand {
+      padding: 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: conic-gradient(from 210deg, #7f67be, #6750A4, #9b87f5, #7f67be);
+      position: relative;
+      box-shadow: 0 6px 16px rgba(103,80,164,.4), inset 0 0 0 1px rgba(255,255,255,.1);
+    }
+
+    .logo::after {
+      content: "";
+      position: absolute;
+      inset: 8px 9px 8px 12px;
+      background: linear-gradient(180deg, #fff, #e2e8f0);
+      clip-path: polygon(60% 0%, 40% 40%, 70% 40%, 35% 100%, 45% 55%, 20% 55%);
+    }
+
+    .brand-text h1 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--primary-light), #9b87f5);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-text p {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .nav-menu {
+      flex: 1;
+      padding: 20px 0;
+      overflow-y: auto;
+    }
+
+    .nav-section {
+      margin-bottom: 24px;
+    }
+
+    .nav-section-title {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 0 20px 8px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 20px;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: all 0.2s ease;
+      border-left: 3px solid transparent;
+    }
+
+    .nav-item:hover, .nav-item.active {
+      background: rgba(103, 80, 164, 0.1);
+      color: var(--text);
+      border-left-color: var(--primary);
+    }
+
+    .nav-item.active {
+      background: rgba(103, 80, 164, 0.15);
+    }
+
+    .nav-icon {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+
+    .nav-badge {
+      margin-left: auto;
+      background: var(--danger);
+      color: white;
+      font-size: 0.75rem;
+      padding: 2px 6px;
+      border-radius: 10px;
+      font-weight: 600;
+    }
+
+    /* Topbar */
+    .topbar {
+      grid-area: topbar;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      backdrop-filter: blur(10px);
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .breadcrumb {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .search-box {
+      display: flex;
+      align-items: center;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 8px 12px;
+      width: 280px;
+    }
+
+    .search-box input {
+      background: none;
+      border: none;
+      outline: none;
+      color: var(--text);
+      font-size: 0.9rem;
+      width: 100%;
+      margin-left: 8px;
+    }
+
+    .search-box input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .notification-btn {
+      position: relative;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 8px;
+      border-radius: var(--radius);
+      transition: all 0.2s ease;
+    }
+
+    .notification-btn:hover {
+      background: var(--card);
+      color: var(--text);
+    }
+
+    .notification-badge {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      background: var(--danger);
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .user-menu {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--card);
+      padding: 8px 12px;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .user-menu:hover {
+      background: var(--primary);
+    }
+
+    .user-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    /* Main Content */
+    .main-content {
+      grid-area: main;
+      padding: 24px;
+      overflow-y: auto;
+      background: linear-gradient(135deg, rgba(103,80,164,0.02), rgba(0,0,0,0.02));
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 24px;
+      height: 100%;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 35px rgba(0,0,0,.5);
+    }
+
+    .card-header {
+      padding: 20px 20px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .card-subtitle {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .card-content {
+      padding: 20px;
+    }
+
+    .claim-details {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .detail-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+    }
+
+    .detail-label {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    .detail-value {
+      font-weight: 500;
+    }
+
+    .status-badge {
+      padding: 4px 12px;
+      border-radius: 16px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .status-pending {
+      background: rgba(245, 158, 11, 0.2);
+      color: var(--warning);
+    }
+
+    .status-approved {
+      background: rgba(16, 185, 129, 0.2);
+      color: var(--success);
+    }
+
+    .status-flagged {
+      background: rgba(239, 68, 68, 0.2);
+      color: var(--danger);
+    }
+
+    .ai-recommendations {
+      background: linear-gradient(135deg, rgba(103,80,164,0.1), rgba(155,135,245,0.05));
+      border: 1px solid rgba(103,80,164,0.3);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-top: 16px;
+    }
+
+    .ai-recommendations h4 {
+      color: var(--primary-light);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .ai-recommendations ul {
+      list-style: none;
+    }
+
+    .ai-recommendations li {
+      margin-bottom: 8px;
+      padding-left: 16px;
+      position: relative;
+    }
+
+    .ai-recommendations li::before {
+      content: "→";
+      position: absolute;
+      left: 0;
+      color: var(--primary);
+    }
+
+    /* Fraud Score */
+    .fraud-score-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .fraud-score {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      margin-bottom: 16px;
+    }
+
+    .fraud-score svg {
+      transform: rotate(-90deg);
+    }
+
+    .fraud-score circle {
+      fill: none;
+      stroke-width: 12;
+      stroke-linecap: round;
+    }
+
+    .fraud-score .bg {
+      stroke: var(--border);
+    }
+
+    .fraud-score .progress {
+      stroke: var(--danger);
+      stroke-dasharray: 377;
+      stroke-dashoffset: 377;
+      transition: stroke-dashoffset 1.5s ease;
+    }
+
+    .fraud-score span {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--danger);
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .btn {
+      flex: 1;
+      border: none;
+      border-radius: var(--radius);
+      padding: 12px 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 0.9rem;
+    }
+
+    .btn-approve {
+      background: var(--success);
+      color: white;
+    }
+
+    .btn-approve:hover {
+      background: #059669;
+      transform: translateY(-1px);
+    }
+
+    .btn-escalate {
+      background: var(--warning);
+      color: white;
+    }
+
+    .btn-escalate:hover {
+      background: #d97706;
+      transform: translateY(-1px);
+    }
+
+    .btn-reject {
+      background: var(--danger);
+      color: white;
+    }
+
+    .btn-reject:hover {
+      background: #dc2626;
+      transform: translateY(-1px);
+    }
+
+    .right-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .metric-card {
+      text-align: center;
+    }
+
+    .metric-value {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--success);
+      margin-bottom: 4px;
+    }
+
+    .metric-label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .timeline {
+      list-style: none;
+    }
+
+    .timeline li {
+      padding: 8px 0;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .timeline-icon {
+      font-size: 1.2rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .dashboard {
+        grid-template-areas: 
+          "topbar"
+          "main";
+        grid-template-columns: 1fr;
+        grid-template-rows: var(--topbar-height) 1fr;
+      }
+
+      .sidebar {
+        position: fixed;
+        left: -280px;
+        top: 0;
+        height: 100vh;
+        z-index: 1000;
+        transition: left 0.3s ease;
+      }
+
+      .sidebar.open {
+        left: 0;
+      }
+
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo"></div>
+        <div class="brand-text">
+          <h1>ClaimLightning</h1>
+          <p>Admin Portal</p>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <div class="nav-section">
+          <div class="nav-section-title">Overview</div>
+          <a href="#" class="nav-item active">
+            <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+            </svg>
+            Dashboard
+          </a>
+          <a href="#" class="nav-item">
+            <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            Claims Review
+            <span class="nav-badge">12</span>
+          </a>
+        </div>
+
+        <div class="nav-section">
+          <div class="nav-section-title">Claims Management</div>
+          <a href="#" class="nav-item">
+            <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            New Claims
+          </a>
+          <a href="#" class="nav-item">
+            <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            Pending Review
+          </a>
+          <a href="#" class="nav-item">
+            <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            Approved Claims
+          </a>
+          <a href="#" class="nav-item">
+            <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+            Fraud Alerts
+            <span class="nav-badge">3</span>
+          </a>
+        </div>
+
+        <div class="nav-section">
+          <div class="nav-section-title">Analytics</div>
+          <a href="#" class="nav-item">
+            <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            Reports
+          </a>
+          <a href="#" class="nav-item">
+            <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+            </svg>
+            AI Insights
+          </a>
+        </div>
+
+        <div class="nav-section">
+          <div class="nav-section-title">Settings</div>
+          <a href="#" class="nav-item">
+            <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
+            </svg>
+            Users
+          </a>
+          <a href="#" class="nav-item">
+            <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+            System Settings
+          </a>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- Topbar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <div class="breadcrumb">Claim Review - PL123456</div>
+        <div class="search-box">
+          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+          <input type="text" placeholder="Search claims, policies, customers...">
+        </div>
+      </div>
+
+      <div class="topbar-right">
+        <button class="notification-btn">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5-5V9a6 6 0 10-12 0v3l-5 5h5m7 0v1a3 3 0 01-6 0v-1m6 0H9"/>
+          </svg>
+          <div class="notification-badge"></div>
+        </button>
+
+        <div class="user-menu">
+          <div class="user-avatar">AD</div>
+          <span>Admin User</span>
+          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="dashboard-grid">
+        <!-- Left Panel - Claim Details -->
+        <div class="left-panel">
+          <!-- Claimant Profile -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Claimant Profile</div>
+              <div class="card-subtitle">Policy holder information</div>
+            </div>
+            <div class="card-content">
+              <div class="claim-details">
+                <div class="detail-item">
+                  <span class="detail-label">Name</span>
+                  <span class="detail-value">John Doe</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Policy Number</span>
+                  <span class="detail-value">PL123456</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Car Registration</span>
+                  <span class="detail-value">ABC123XZ</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Status</span>
+                  <span class="status-badge status-pending">Under Review</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Incident Summary -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Incident Summary</div>
+              <div class="card-subtitle">Accident details and documentation</div>
+            </div>
+            <div class="card-content">
+              <div class="claim-details">
+                <div class="detail-item">
+                  <span class="detail-label">Type</span>
+                  <span class="detail-value">Total Damage (Motor Accident)</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Details</span>
+                  <span class="detail-value">Collision while avoiding pedestrian</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Evidence</span>
+                  <span class="detail-value">Photos, ₦2,000,000 Invoice, Police Report</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Claim Amount</span>
+                  <span class="detail-value" style="color: var(--warning); font-weight: 600;">₦2,000,000</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- AI Analysis -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">AI Analysis & Recommendations</div>
+              <div class="card-subtitle">Automated claim assessment</div>
+            </div>
+            <div class="card-content">
+              <div class="claim-details">
+                <div class="detail-item">
+                  <span class="detail-label">Missing Fields</span>
+                  <span class="detail-value">phoneNumberOfInsured, extentOfLossOrDamage</span>
+                </div>
+              </div>
+
+              <div class="ai-recommendations">
+                <h4>
+                  <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                  </svg>
+                  AI Recommendations
+                </h4>
+                <ul>
+                  <li>Escalate to Fraud Investigation Unit</li>
+                  <li>Request proof of payment for repairs</li>
+                  <li>Verify pricing with certified garage</li>
+                  <li>Contact claimant for missing documentation</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Panel - Intelligence & Actions -->
+        <div class="right-panel">
+          <!-- Fraud Score -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Fraud Risk Assessment</div>
+              <div class="card-subtitle">AI-powered fraud detection</div>
+            </div>
+            <div class="card-content">
+              <div class="fraud-score-container">
+                <div class="fraud-score">
+                  <svg width="120" height="120">
+                    <circle class="bg" cx="60" cy="60" r="60"></circle>
+                    <circle class="progress" cx="60" cy="60" r="60"></circle>
+                  </svg>
+                  <span id="fraudPercent">0%</span>
+                </div>
+                <div style="text-align: center; color: var(--danger); font-weight: 600;">HIGH RISK</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Suggested Settlement -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">AI Settlement Recommendation</div>
+            </div>
+            <div class="card-content metric-card">
+              <div class="metric-value">₦1,500,000</div>
+              <div class="metric-label">AI-adjusted from repair estimates</div>
+              <div style="margin-top: 12px; font-size: 0.85rem; color: var(--text-muted);">
+                Original claim: ₦2,000,000<br>
+                Adjustment: -25% due to market pricing
+              </div>
+            </div>
+          </div>
+
+          <!-- AI Confidence -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">AI Model Confidence</div>
+            </div>
+            <div class="card-content">
+              <div class="claim-details">
+                <div class="detail-item">
+                  <span class="detail-label">Fraud Detection Model</span>
+                  <span class="detail-value" style="color: var(--danger); font-weight: 600;">88%</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Repair Cost Estimator</span>
+                  <span class="detail-value" style="color: var(--success); font-weight: 600;">92%</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Document Verification</span>
+                  <span class="detail-value" style="color: var(--warning); font-weight: 600;">76%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Timeline -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Claim Timeline</div>
+            </div>
+            <div class="card-content">
+              <ul class="timeline">
+                <li>
+                  <span class="timeline-icon">📩</span>
+                  <span>Claim Submitted</span>
+                </li>
+                <li>
+                  <span class="timeline-icon">🤖</span>
+                  <span>AI Triage Complete</span>
+                </li>
+                <li>
+                  <span class="timeline-icon">⚠️</span>
+                  <span>Escalation Flagged</span>
+                </li>
+                <li>
+                  <span class="timeline-icon">👁️</span>
+                  <span>Under Review</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Actions</div>
+              <div class="card-subtitle">Review and process claim</div>
+            </div>
+            <div class="card-content">
+              <div class="actions">
+                <button class="btn btn-approve" onclick="handleAction('approve')">
+                  <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right: 4px;">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                  </svg>
+                  Approve
+                </button>
+                <button class="btn btn-escalate" onclick="handleAction('escalate')">
+                  <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right: 4px;">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                  </svg>
+                  Escalate
+                </button>
+                <button class="btn btn-reject" onclick="handleAction('reject')">
+                  <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right: 4px;">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                  </svg>
+                  Reject
+                </button>
+              </div>
+              <div style="margin-top: 12px; text-align: center; font-size: 0.8rem; color: var(--text-muted);">
+                All actions are logged and auditable
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Animate fraud score
+    const fraudScore = 72; // %
+    const circle = document.querySelector('.progress');
+    const percentText = document.getElementById('fraudPercent');
+    const radius = circle.r.baseVal.value;
+    const circumference = 2 * Math.PI * radius;
+
+    circle.style.strokeDasharray = circumference;
+    circle.style.strokeDashoffset = circumference;
+
+    // Animate on load
+    setTimeout(() => {
+      let progress = 0;
+      const animate = setInterval(() => {
+        if (progress >= fraudScore) {
+          clearInterval(animate);
+          return;
+        }
+        percentText.textContent = progress + "%";
+        const offset = circumference - (progress / 100) * circumference;
+        circle.style.strokeDashoffset = offset;
+        progress++;
+      }, 20);
+    }, 500);
+
+    // Handle action buttons
+    function handleAction(action) {
+      const messages = {
+        approve: 'Claim approved for ₦1,500,000. Settlement will be processed within 2-3 business days.',
+        escalate: 'Claim escalated to Fraud Investigation Unit. Senior analyst will review within 24 hours.',
+        reject: 'Claim rejected due to insufficient documentation. Claimant will be notified with required documents.'
+      };
+
+      const colors = {
+        approve: 'var(--success)',
+        escalate: 'var(--warning)',
+        reject: 'var(--danger)'
+      };
+
+      // Show confirmation
+      const confirmed = confirm(`Are you sure you want to ${action} this claim?\n\n${messages[action]}`);
+      
+      if (confirmed) {
+        // Create notification
+        showNotification(`Claim ${action}d successfully!`, colors[action]);
+        
+        // Update UI to reflect action
+        const statusBadge = document.querySelector('.status-badge');
+        statusBadge.textContent = action === 'approve' ? 'Approved' : 
+                                 action === 'escalate' ? 'Escalated' : 'Rejected';
+        statusBadge.className = `status-badge status-${action === 'approve' ? 'approved' : 
+                                                     action === 'escalate' ? 'pending' : 'flagged'}`;
+        
+        // Disable action buttons
+        const actionButtons = document.querySelectorAll('.actions .btn');
+        actionButtons.forEach(btn => {
+          btn.disabled = true;
+          btn.style.opacity = '0.5';
+          btn.style.cursor = 'not-allowed';
+        });
+      }
+    }
+
+    // Show notification
+    function showNotification(message, color) {
+      const notification = document.createElement('div');
+      notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${color};
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        z-index: 10000;
+        transform: translateX(400px);
+        transition: transform 0.3s ease;
+      `;
+      notification.textContent = message;
+      
+      document.body.appendChild(notification);
+      
+      // Animate in
+      setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+      }, 100);
+      
+      // Remove after 3 seconds
+      setTimeout(() => {
+        notification.style.transform = 'translateX(400px)';
+        setTimeout(() => document.body.removeChild(notification), 300);
+      }, 3000);
+    }
+
+    // Mobile sidebar toggle (for responsive)
+    function toggleSidebar() {
+      document.querySelector('.sidebar').classList.toggle('open');
+    }
+
+    // Search functionality
+    document.querySelector('.search-box input').addEventListener('input', function(e) {
+      const query = e.target.value.toLowerCase();
+      // In a real app, this would filter claims/policies/customers
+      console.log('Searching for:', query);
+    });
+
+    // Add some interactive hover effects
+    document.addEventListener('DOMContentLoaded', function() {
+      // Add hover effects to nav items
+      const navItems = document.querySelectorAll('.nav-item');
+      navItems.forEach(item => {
+        item.addEventListener('mouseenter', function() {
+          if (!this.classList.contains('active')) {
+            this.style.transform = 'translateX(4px)';
+          }
+        });
+        
+        item.addEventListener('mouseleave', function() {
+          if (!this.classList.contains('active')) {
+            this.style.transform = 'translateX(0)';
+          }
+        });
+      });
+
+      // Add pulse animation to notification badges
+      const badges = document.querySelectorAll('.nav-badge, .notification-badge');
+      badges.forEach(badge => {
+        setInterval(() => {
+          badge.style.animation = 'pulse 1.5s ease-in-out';
+          setTimeout(() => badge.style.animation = '', 1500);
+        }, 5000);
+      });
+    });
+
+    // Add pulse keyframe animation via CSS
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+      }
+      
+      .nav-item {
+        transition: transform 0.2s ease;
+      }
+    `;
+    document.head.appendChild(style);
+  </script>
+</body>
+</html>

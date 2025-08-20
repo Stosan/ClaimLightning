@@ -50,7 +50,6 @@ def retrieve_memory_with_k(collection, policy_number: str, k: int = 3):
     query = {"policy_number": policy_number, "timestamp": {"$gte": min_time.isoformat()}}
     # Define the fields to return
     projection = {"History": 1}
-    print("query >> ",query)
 
     try:
         # Sort the results in descending order by timestamp and retrieve the first k results
@@ -60,7 +59,6 @@ def retrieve_memory_with_k(collection, policy_number: str, k: int = 3):
         # Check if the query returned a result
         if result != []:
             for r in reversed(result):
-                print(r)
                 chat_history.append(r['History']['data']['user_prompt'])
                 chat_history.append(r['History']['data']['ai_response'])
             return chat_history

@@ -100,6 +100,10 @@ async def home(request: Request,):
 async def claim_application(request: Request,):
     return templates.TemplateResponse(request=request,name="claim.html",context={})
 
+@app.get("/claim-admin-backend", response_class=HTMLResponse)
+async def claim_backend_application(request: Request,):
+    return templates.TemplateResponse(request=request,name="admin.html",context={})
+
 app.include_router(claim_router,prefix=settings.API_V1_STR,  
                    tags=["AUTH"],dependencies=[  Depends(get_db_client),Depends(get_settings),],)
 

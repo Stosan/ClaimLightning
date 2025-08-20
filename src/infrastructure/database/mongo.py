@@ -34,6 +34,7 @@ class MongoDBClientConfig:
             
             # Setup collection
             collection_name = 'aichatmemory'
+            self.context_collection = None
             self._setup_collection(collection_name)
             
             logger.info("🎉 MongoDB initialization completed successfully!")
@@ -91,21 +92,20 @@ class MongoDBClientConfig:
                     return f"{protocol}://***:***@{host_and_path}"
         return uri.split('://')[0] + '://***' if '://' in uri else '***'
 
-    @classmethod
-    def get_context_db(cls)->Database:
+
+    def get_context_db(self)->Database:
         """Get the context database instance with logging."""
         logger.info("🔍 Retrieving context database instance...")
-        instance = cls()
-        logger.info("✅ Context database instance retrieved successfully")
-        return instance.context_db
 
-    @classmethod 
-    def get_context_collection(cls)->Collection:
+        logger.info("✅ Context database instance retrieved successfully")
+        return self.context_db
+
+
+    def get_context_collection(self)->Collection:
         """Get the context collection instance with logging."""
         logger.info("🔍 Retrieving context collection instance...")
-        instance = cls()
         logger.info("✅ Context collection instance retrieved successfully")
-        return instance.context_collection
+        return self.context_collection
 
     def health_check(self):
         """Perform a health check on the MongoDB connection."""
