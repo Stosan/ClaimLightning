@@ -116,15 +116,19 @@ cp example.env .env
 
 Configure your `.env`:
 ```
-OPENAI_API_KEY=your_openai_api_key
-CLAIM_DB_URI=postgresql://user:password@localhost:5432/claims
+PORT=8000
+ENVIRONMENT=development
+X-API-KEY=<YOUR_X-API-KEY>
+AIMLAPI-KEY=<YOUR_AIMLAPI_KEY>
+DB_CONN_URL=<YOUR_MONOGO_DB_CONN_URL>
+DB_DBNAME=<YOUR_MONGO_DB_DBNAME>
 ```
 
 ## 🎮 Usage
 
 ```bash
-# Run the API
-uvicorn src.application.app:app --reload --port 8000
+poetry run uvicorn src.application.main:app --reload --port 8000 # Run the API
+
 ```
 
 Endpoints:

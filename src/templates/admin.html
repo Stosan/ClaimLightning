@@ -121,6 +121,7 @@
       text-decoration: none;
       transition: all 0.2s ease;
       border-left: 3px solid transparent;
+      cursor: pointer;
     }
 
     .nav-item:hover, .nav-item.active {
@@ -147,6 +148,12 @@
       padding: 2px 6px;
       border-radius: 10px;
       font-weight: 600;
+      min-width: 20px;
+      text-align: center;
+    }
+
+    .nav-badge.new {
+      animation: pulse 2s infinite;
     }
 
     /* Topbar */
@@ -286,6 +293,7 @@
     .card-header {
       padding: 20px 20px 16px;
       border-bottom: 1px solid var(--border);
+      position: relative;
     }
 
     .card-title {
@@ -343,9 +351,14 @@
       color: var(--success);
     }
 
-    .status-flagged {
+    .status-flagged, .status-rejected {
       background: rgba(239, 68, 68, 0.2);
       color: var(--danger);
+    }
+
+    .status-escalated {
+      background: rgba(245, 158, 11, 0.2);
+      color: var(--warning);
     }
 
     .ai-recommendations {
@@ -383,28 +396,30 @@
 
     /* Fraud Score */
     .fraud-score-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 20px;
-    }
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 30px 20px;
+}
 
-    .fraud-score {
-      position: relative;
-      width: 120px;
-      height: 120px;
-      margin-bottom: 16px;
-    }
+.fraud-score {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  margin-bottom: 20px;
+}
+
 
     .fraud-score svg {
       transform: rotate(-90deg);
     }
 
     .fraud-score circle {
-      fill: none;
-      stroke-width: 12;
-      stroke-linecap: round;
-    }
+  fill: none;
+  stroke-width: 8;
+  stroke-linecap: round;
+}
+
 
     .fraud-score .bg {
       stroke: var(--border);
@@ -444,12 +459,17 @@
       font-size: 0.9rem;
     }
 
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
     .btn-approve {
       background: var(--success);
       color: white;
     }
 
-    .btn-approve:hover {
+    .btn-approve:hover:not(:disabled) {
       background: #059669;
       transform: translateY(-1px);
     }
@@ -459,7 +479,7 @@
       color: white;
     }
 
-    .btn-escalate:hover {
+    .btn-escalate:hover:not(:disabled) {
       background: #d97706;
       transform: translateY(-1px);
     }
@@ -469,7 +489,7 @@
       color: white;
     }
 
-    .btn-reject:hover {
+    .btn-reject:hover:not(:disabled) {
       background: #dc2626;
       transform: translateY(-1px);
     }
@@ -506,10 +526,109 @@
       display: flex;
       align-items: center;
       gap: 8px;
+      opacity: 0.7;
+      transition: opacity 0.3s ease;
+    }
+
+    .timeline li.current {
+      opacity: 1;
+      color: var(--primary-light);
+      font-weight: 600;
     }
 
     .timeline-icon {
       font-size: 1.2rem;
+    }
+
+    /* Loading states */
+    .loading {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .loading::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+      animation: loading 1.5s infinite;
+    }
+
+    .no-claim {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 60vh;
+      text-align: center;
+      color: var(--text-muted);
+    }
+
+    .no-claim-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+
+    .connection-status {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--success);
+    }
+
+    .connection-status.disconnected {
+      background: var(--danger);
+      animation: blink 1s infinite;
+    }
+
+    /* Tabs styling */
+    .tab-nav-container {
+      margin-bottom: 24px;
+    }
+
+    .tab-nav {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      gap: 8px;
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1rem;
+      font-weight: 600;
+      padding: 12px 0;
+      cursor: pointer;
+      transition: color 0.2s ease, border-bottom 0.2s ease;
+      border-bottom: 3px solid transparent;
+      outline: none;
+    }
+
+    .tab-btn:hover:not(.active) {
+      color: var(--text);
+    }
+
+    .tab-btn.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    .tab-content {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .tab-content.hidden {
+      display: none;
     }
 
     /* Responsive */
@@ -539,6 +658,31 @@
         grid-template-columns: 1fr;
       }
     }
+
+    /* Animations */
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.1); opacity: 0.8; }
+    }
+
+    @keyframes loading {
+      0% { left: -100%; }
+      100% { left: 100%; }
+    }
+
+    @keyframes blink {
+      0%, 50% { opacity: 1; }
+      51%, 100% { opacity: 0.3; }
+    }
+
+    .fade-in {
+      animation: fadeIn 0.5s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
   </style>
 </head>
 <body>
@@ -556,81 +700,44 @@
       <nav class="nav-menu">
         <div class="nav-section">
           <div class="nav-section-title">Overview</div>
-          <a href="#" class="nav-item active">
+          <div class="nav-item active" data-view="dashboard">
             <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
             </svg>
             Dashboard
-          </a>
-          <a href="#" class="nav-item">
+          </div>
+          <div class="nav-item" data-view="claims-review">
             <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
             </svg>
             Claims Review
-            <span class="nav-badge">12</span>
-          </a>
+            <span class="nav-badge" id="reviewBadge">0</span>
+          </div>
         </div>
 
         <div class="nav-section">
           <div class="nav-section-title">Claims Management</div>
-          <a href="#" class="nav-item">
+          <div class="nav-item" data-view="new-claims">
             <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
             </svg>
             New Claims
-          </a>
-          <a href="#" class="nav-item">
+            <span class="nav-badge" id="newClaimsBadge">0</span>
+          </div>
+          <div class="nav-item" data-view="pending-review">
             <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
             </svg>
             Pending Review
-          </a>
-          <a href="#" class="nav-item">
-            <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-            Approved Claims
-          </a>
-          <a href="#" class="nav-item">
+            <span class="nav-badge" id="pendingBadge">0</span>
+          </div>
+          <div class="nav-item" data-view="fraud-alerts">
             <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
             </svg>
             Fraud Alerts
-            <span class="nav-badge">3</span>
-          </a>
-        </div>
-
-        <div class="nav-section">
-          <div class="nav-section-title">Analytics</div>
-          <a href="#" class="nav-item">
-            <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-            </svg>
-            Reports
-          </a>
-          <a href="#" class="nav-item">
-            <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-            </svg>
-            AI Insights
-          </a>
-        </div>
-
-        <div class="nav-section">
-          <div class="nav-section-title">Settings</div>
-          <a href="#" class="nav-item">
-            <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
-            </svg>
-            Users
-          </a>
-          <a href="#" class="nav-item">
-            <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-            </svg>
-            System Settings
-          </a>
+            <span class="nav-badge" id="fraudBadge">0</span>
+          </div>
         </div>
       </nav>
     </aside>
@@ -638,16 +745,17 @@
     <!-- Topbar -->
     <header class="topbar">
       <div class="topbar-left">
-        <div class="breadcrumb">Claim Review - PL123456</div>
+        <div class="breadcrumb" id="breadcrumb">Dashboard</div>
         <div class="search-box">
           <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
           </svg>
-          <input type="text" placeholder="Search claims, policies, customers...">
+          <input type="text" id="searchInput" placeholder="Search claims, policies, customers...">
         </div>
       </div>
 
       <div class="topbar-right">
+        <div class="connection-status" id="connectionStatus" title="Connection Status"></div>
         <button class="notification-btn">
           <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5-5V9a6 6 0 10-12 0v3l-5 5h5m7 0v1a3 3 0 01-6 0v-1m6 0H9"/>
@@ -657,7 +765,7 @@
 
         <div class="user-menu">
           <div class="user-avatar">AD</div>
-          <span>Admin User</span>
+          <span>Admin</span>
           <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
           </svg>
@@ -666,11 +774,596 @@
     </header>
 
     <!-- Main Content -->
-    <main class="main-content">
-      <div class="dashboard-grid">
-        <!-- Left Panel - Claim Details -->
-        <div class="left-panel">
-          <!-- Claimant Profile -->
+    <main class="main-content" id="mainContent">
+      <!-- Dynamic content will be loaded here -->
+      <div class="no-claim" id="noClaim">
+        <div class="no-claim-icon">📋</div>
+        <h2>No Claims Selected</h2>
+        <p>Select a claim from the sidebar to view details</p>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Global state management
+    class ClaimPortal {
+      constructor() {
+        this.claims = new Map();
+        this.currentClaim = null;
+        this.pollingInterval = null;
+        this.isConnected = true;
+        this.lastUpdate = Date.now();
+        
+        this.init();
+      }
+
+      init() {
+        this.setupEventListeners();
+        // this.startPolling();
+        this.loadInitialData();
+      }
+
+      setupEventListeners() {
+        // Navigation
+        document.querySelectorAll('.nav-item').forEach(item => {
+          item.addEventListener('click', (e) => this.handleNavigation(e));
+        });
+
+        // Search
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+          this.handleSearch(e.target.value);
+        });
+
+        // // Window focus/blur for polling optimization
+        // window.addEventListener('focus', () => {
+        //   if (!this.pollingInterval) {
+        //     this.startPolling();
+        //   }
+        // });
+
+        window.addEventListener('blur', () => {
+          // Reduce polling when window is not focused
+          // Keep polling but at lower frequency for critical updates
+        });
+      }
+      async fetchClaims() {
+  try {
+    const response = await fetch('http://127.0.0.1:8000/api/v1/claims/claimant-list', {
+      method: 'GET',
+      headers: {
+        'X-API-KEY': 'blemisshes', 
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    return { success: true, data: result.data || [] };
+  } catch (error) {
+    console.error('Error fetching claims:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+
+
+
+async fetchClaimDetails(claimId) {
+  try {
+    const response = await fetch(`http://127.0.0.1:8000/api/v1/claims/mock-data/${claimId}`, {
+      method: 'GET',
+      headers: {
+        'X-API-KEY':'blemisshes', 
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    
+    // Ensure we return the expected structure
+    return {
+      success: true,
+      status: result.status || 'completed',
+      processing_status: result.processing_status || 'Completed',
+      progress: result.progress || 100,
+      data: result.data || null,
+      error: null
+    };
+  } catch (error) {
+    console.error('Error fetching claim details:', error);
+    return { 
+      success: false, 
+      error: error.message,
+      status: 'error',
+      data: null 
+    };
+  }
+}
+
+
+      async updateClaimStatus(claimId, status, notes = '') {
+        try {
+          await this.delay(800);
+          
+          // Update local state
+          if (this.claims.has(claimId)) {
+            const claim = this.claims.get(claimId);
+            claim.status = status;
+            claim.timeline.push({
+              timestamp: new Date().toISOString(),
+              action: status,
+              user: 'Admin User',
+              notes: notes
+            });
+          }
+
+          return { success: true };
+        } catch (error) {
+          console.error('Error updating claim status:', error);
+          return { success: false, error: error.message };
+        }
+      }
+
+      // async startPolling() {
+      //   if (this.pollingInterval) {
+      //     clearInterval(this.pollingInterval);
+      //   }
+
+      //   // Poll every 5 seconds for new claims
+      //   this.pollingInterval = setInterval(async () => {
+      //     await this.checkForUpdates();
+      //   }, 30000);
+
+      //   // Initial check
+      //   await this.checkForUpdates();
+      // }
+
+      async checkForUpdates() {
+        try {
+          const response = await this.fetchClaims();
+          
+          if (response.success) {
+            this.updateConnectionStatus(true);
+            this.processClaimsUpdate(response.data);
+          } else {
+            this.updateConnectionStatus(false);
+          }
+        } catch (error) {
+          console.error('Polling error:', error);
+          this.updateConnectionStatus(false);
+        }
+      }
+
+      processClaimsUpdate(newClaims) {
+        let hasNewClaims = false;
+        let statusChanges = 0;
+
+        newClaims.forEach(claim => {
+          if (!this.claims.has(claim.id)) {
+            // New claim
+            this.claims.set(claim.id, claim);
+            if (claim.isNew) {
+              hasNewClaims = true;
+              this.showNewClaimNotification(claim);
+            }
+          } else {
+            // Check for status changes
+            const existingClaim = this.claims.get(claim.id);
+            if (existingClaim.status !== claim.status || 
+                existingClaim.lastUpdated !== claim.lastUpdated) {
+              statusChanges++;
+              this.claims.set(claim.id, { ...existingClaim, ...claim });
+              
+              // Update current view if this claim is being viewed
+              if (this.currentClaim && this.currentClaim.id === claim.id) {
+                this.loadClaimDetails(claim.id);
+              }
+            }
+          }
+        });
+
+        // Update UI counters
+        this.updateNavigationCounters();
+
+        if (hasNewClaims || statusChanges > 0) {
+          this.lastUpdate = Date.now();
+        }
+      }
+
+      updateConnectionStatus(connected) {
+        const statusElement = document.getElementById('connectionStatus');
+        this.isConnected = connected;
+        
+        if (connected) {
+          statusElement.classList.remove('disconnected');
+          statusElement.title = 'Connected - Live updates active';
+        } else {
+          statusElement.classList.add('disconnected');
+          statusElement.title = 'Connection issues - Retrying...';
+        }
+      }
+
+      updateNavigationCounters() {
+        const claimsArray = Array.from(this.claims.values());
+        
+        const counters = {
+          new: claimsArray.filter(c => c.isNew).length,
+          pending: claimsArray.filter(c => c.status === 'processing').length,
+          fraud: claimsArray.filter(c => c.status === 'flagged' || c.fraudScore > 70).length,
+          review: claimsArray.filter(c => ['flagged'].includes(c.status)).length
+        };
+
+        document.getElementById('newClaimsBadge').textContent = counters.new;
+        document.getElementById('pendingBadge').textContent = counters.pending;
+        document.getElementById('fraudBadge').textContent = counters.fraud;
+        document.getElementById('reviewBadge').textContent = counters.review;
+
+        // Add pulse animation for new items
+        Object.keys(counters).forEach(key => {
+          const badge = document.getElementById(`${key === 'review' ? 'review' : key === 'new' ? 'newClaims' : key}Badge`);
+          if (badge && counters[key] > 0) {
+            badge.classList.add('new');
+          }
+        });
+      }
+
+      showNewClaimNotification(claim) {
+        this.showNotification(
+          `New claim submitted: ${claim.id} - ${claim.claimantName}`,
+          'var(--primary)',
+          8000
+        );
+
+        // Add to timeline or activity feed if implemented
+        console.log('New claim notification:', claim);
+      }
+
+      async loadInitialData() {
+        const response = await this.fetchClaims();
+        if (response.success) {
+          this.processClaimsUpdate(response.data);
+          
+          // Load first claim if available
+          if (this.claims.size > 0) {
+            const firstClaim = Array.from(this.claims.values())[0];
+            await this.loadClaimDetails(firstClaim.id);
+          }
+        }
+      }
+
+      handleNavigation(e) {
+        const item = e.currentTarget;
+        const view = item.dataset.view;
+
+        // Update active state
+        document.querySelectorAll('.nav-item').forEach(navItem => {
+          navItem.classList.remove('active');
+        });
+        item.classList.add('active');
+
+        // Update breadcrumb
+        const breadcrumb = document.getElementById('breadcrumb');
+        const viewTitles = {
+          'dashboard': 'Dashboard',
+          'claims-review': 'Claims Review',
+          'new-claims': 'New Claims',
+          'pending-review': 'Pending Review',
+          'fraud-alerts': 'Fraud Alerts'
+        };
+
+        breadcrumb.textContent = viewTitles[view] || 'Dashboard';
+
+        // Load view content
+        this.loadView(view);
+      }
+
+      async loadView(view) {
+        const mainContent = document.getElementById('mainContent');
+        
+        switch (view) {
+          case 'dashboard':
+          case 'claims-review':
+            // Show first available claim or no-claim message
+            if (this.claims.size > 0) {
+              const claimsArray = Array.from(this.claims.values());
+              const targetClaim = claimsArray.find(c => ['pending', 'under_review', 'flagged'].includes(c.status)) || claimsArray[0];
+              await this.loadClaimDetails(targetClaim.id);
+            } else {
+              this.showNoClaims();
+            }
+            break;
+          case 'new-claims':
+            this.showClaimsList('new');
+            break;
+          case 'pending-review':
+            this.showClaimsList('pending');
+            break;
+          case 'fraud-alerts':
+            this.showClaimsList('fraud');
+            break;
+          default:
+            this.showNoClaims();
+        }
+      }
+
+      showClaimsList(filter) {
+        const mainContent = document.getElementById('mainContent');
+        const claimsArray = Array.from(this.claims.values());
+        
+        let filteredClaims = claimsArray;
+        
+        switch (filter) {
+          case 'new':
+            filteredClaims = claimsArray.filter(c => c.isNew);
+            break;
+          case 'pending':
+            filteredClaims = claimsArray.filter(c => c.status === 'pending' || c.status === 'under_review');
+            break;
+          case 'fraud':
+            filteredClaims = claimsArray.filter(c => c.status === 'flagged' || c.fraudScore > 70);
+            break;
+        }
+
+        if (filteredClaims.length === 0) {
+          mainContent.innerHTML = `
+            <div class="no-claim">
+              <div class="no-claim-icon">📋</div>
+              <h2>No Claims Found</h2>
+              <p>No claims match the current filter</p>
+            </div>
+          `;
+          return;
+        }
+
+        const claimsListHTML = `
+          <div class="claims-list">
+            <div class="claims-header" style="margin-bottom: 20px;">
+              <h2>Claims List (${filteredClaims.length})</h2>
+            </div>
+            <div class="claims-grid" style="display: grid; gap: 16px;">
+              ${filteredClaims.map(claim => `
+                <div class="card claim-card" style="cursor: pointer;" onclick="portal.loadClaimDetails('${claim.id}')">
+                  <div class="card-content">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                      <h3 style="font-size: 1.1rem; margin: 0;">${claim.id}</h3>
+                      <span class="status-badge status-${claim.status.replace('_', '-')}">${claim.status.replace('_', ' ').toUpperCase()}</span>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; font-size: 0.9rem;">
+                      <div>
+                        <div style="color: var(--text-muted);">Claimant</div>
+                        <div>${claim.claimantName}</div>
+                      </div>
+                      <div>
+                        <div style="color: var(--text-muted);">Amount</div>
+                        <div style="font-weight: 600;">₦${claim.claimAmount.toLocaleString()}</div>
+                      </div>
+                      <div>
+                        <div style="color: var(--text-muted);">Type</div>
+                        <div>${claim.claimType}</div>
+                      </div>
+                      <div>
+                        <div style="color: var(--text-muted);">Fraud Score</div>
+                        <div style="color: ${claim.fraudScore > 50 ? 'var(--danger)' : claim.fraudScore > 20 ? 'var(--warning)' : 'var(--success)'}; font-weight: 600;">${claim.fraudScore}%</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+
+        mainContent.innerHTML = claimsListHTML;
+      }
+      async loadClaimDetailsWithPolling(claimId) {
+  const mainContent = document.getElementById('mainContent');
+  
+  // Show initial loading state
+  mainContent.innerHTML = `
+    <div class="dashboard-grid">
+      <div class="left-panel">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Processing Claim Analysis...</div>
+            <div class="card-subtitle">AI is analyzing the claim data</div>
+          </div>
+          <div class="card-content">
+            <div style="text-align: center; padding: 40px;">
+              <div class="loading-spinner" style="margin-bottom: 16px;"></div>
+              <div id="processingStatus">Initializing analysis...</div>
+              <div class="progress-bar" style="margin-top: 16px;">
+                <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
+              </div>
+              <div style="margin-top: 8px; font-size: 0.85rem; color: var(--text-muted);">
+                <span id="progressPercent">0%</span> complete
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Add loading spinner CSS if not already added
+  if (!document.querySelector('#loading-spinner-style')) {
+    const style = document.createElement('style');
+    style.id = 'loading-spinner-style';
+    style.textContent = `
+      .loading-spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid var(--border);
+        border-top: 4px solid var(--primary);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto;
+      }
+      
+      .progress-bar {
+        width: 100%;
+        height: 8px;
+        background: var(--border);
+        border-radius: 4px;
+        overflow: hidden;
+      }
+      
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--primary), var(--primary-light));
+        border-radius: 4px;
+        transition: width 0.3s ease;
+      }
+      
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  let pollAttempts = 0;
+  const maxAttempts = 30; // Maximum 30 attempts (60 seconds if polling every 2 seconds)
+
+  // Polling function with proper error handling
+  const pollForCompletion = async () => {
+    try {
+      pollAttempts++;
+      
+      if (pollAttempts > maxAttempts) {
+        throw new Error('Processing timeout - maximum attempts exceeded');
+      }
+
+      const response = await this.fetchClaimDetails(claimId);
+      
+      if (!response.success) {
+        throw new Error(response.error || 'Failed to fetch claim details');
+      }
+
+      // Update UI elements safely
+      const statusElement = document.getElementById('processingStatus');
+      const progressElement = document.getElementById('progressFill');
+      const percentElement = document.getElementById('progressPercent');
+
+      if (statusElement && response.processing_status) {
+        statusElement.textContent = response.processing_status;
+      }
+      
+      if (progressElement && typeof response.progress === 'number') {
+        progressElement.style.width = `${response.progress}%`;
+        if (percentElement) {
+          percentElement.textContent = `${response.progress}%`;
+        }
+      }
+
+      // Check response status
+      if (response.status === 'running') {
+        // Continue polling after 2 seconds
+        setTimeout(() => {
+          pollForCompletion().catch(error => {
+            console.error('Polling continuation error:', error);
+            this.handlePollingError(claimId, error);
+          });
+        }, 2000);
+      } else if (response.status === 'completed' && response.data) {
+        // Processing complete, render the claim details
+        this.currentClaim = response.data;
+        this.renderClaimDetails(response.data);
+        
+        // Update breadcrumb
+        const breadcrumbElement = document.getElementById('breadcrumb');
+        if (breadcrumbElement) {
+          breadcrumbElement.textContent = `Claim Review - ${claimId}`;
+        }
+        
+        // Show completion notification
+        this.showNotification('Claim analysis completed successfully!', 'var(--success)');
+      } else {
+        throw new Error(`Unexpected response status: ${response.status}`);
+      }
+      
+    } catch (error) {
+      console.error('Error during polling:', error);
+      this.handlePollingError(claimId, error);
+    }
+  };
+
+  // Start the polling process
+  pollForCompletion();
+}
+
+// Add this new method to handle polling errors
+handlePollingError(claimId, error) {
+  const mainContent = document.getElementById('mainContent');
+  mainContent.innerHTML = `
+    <div class="no-claim">
+      <div class="no-claim-icon">⚠️</div>
+      <h2>Error Loading Claim</h2>
+      <p>Unable to load claim details: ${error.message}</p>
+      <div style="margin-top: 20px;">
+        <button class="btn btn-approve" onclick="portal.loadClaimDetailsWithPolling('${claimId}')" style="margin-right: 8px;">
+          Retry Analysis
+        </button>
+        <button class="btn btn-escalate" onclick="portal.loadView('dashboard')" style="background: var(--text-muted);">
+          Back to Dashboard
+        </button>
+      </div>
+    </div>
+  `;
+}
+      async loadClaimDetails(claimId) {
+        try {
+    await this.loadClaimDetailsWithPolling(claimId);
+  } catch (error) {
+    console.error('Error in loadClaimDetails:', error);
+    this.handlePollingError(claimId, error);
+  }
+}
+
+      handleTabSwitch(tabId) {
+        // Deactivate all tab buttons and hide all content
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
+
+        // Activate the selected tab button
+        const activeBtn = document.querySelector(`.tab-btn[onclick="portal.handleTabSwitch('${tabId}')"]`);
+        if (activeBtn) {
+          activeBtn.classList.add('active');
+        }
+
+        // Show the selected tab content
+        const activeContent = document.getElementById(tabId);
+        if (activeContent) {
+          activeContent.classList.remove('hidden');
+          
+          // Re-animate the fraud score if switching to the analysis tab
+          if (tabId === 'claimAnalysisTab' && this.currentClaim) {
+              this.animateFraudScore(this.currentClaim.fraudScore);
+          }
+        }
+      }
+      renderClaimDetails(claim) {
+  const mainContent = document.getElementById('mainContent');
+  const isActionDisabled = ['approved', 'rejected', 'escalated'].includes(claim.status);
+  
+  mainContent.innerHTML = `
+    <div class="dashboard-grid fade-in">
+      <div class="left-panel">
+        <div class="tab-nav-container">
+          <div class="tab-nav" role="tablist">
+            <button class="tab-btn active" role="tab" onclick="portal.handleTabSwitch('claimInfoTab')">Claim Information</button>
+            <button class="tab-btn" role="tab" onclick="portal.handleTabSwitch('claimAnalysisTab')">Claim Analysis</button>
+          </div>
+        </div>
+
+        <div id="claimInfoTab" class="tab-content" role="tabpanel">
           <div class="card">
             <div class="card-header">
               <div class="card-title">Claimant Profile</div>
@@ -680,25 +1373,24 @@
               <div class="claim-details">
                 <div class="detail-item">
                   <span class="detail-label">Name</span>
-                  <span class="detail-value">John Doe</span>
+                  <span class="detail-value">${claim.claimantName}</span>
                 </div>
                 <div class="detail-item">
                   <span class="detail-label">Policy Number</span>
-                  <span class="detail-value">PL123456</span>
+                  <span class="detail-value">${claim.policyNumber}</span>
                 </div>
                 <div class="detail-item">
                   <span class="detail-label">Car Registration</span>
-                  <span class="detail-value">ABC123XZ</span>
+                  <span class="detail-value">${claim.carRegistration}</span>
                 </div>
                 <div class="detail-item">
                   <span class="detail-label">Status</span>
-                  <span class="status-badge status-pending">Under Review</span>
+                  <span class="status-badge status-${claim.status.replace('_', '-')}">${claim.status.replace('_', ' ').toUpperCase()}</span>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Incident Summary -->
           <div class="card">
             <div class="card-header">
               <div class="card-title">Incident Summary</div>
@@ -708,25 +1400,24 @@
               <div class="claim-details">
                 <div class="detail-item">
                   <span class="detail-label">Type</span>
-                  <span class="detail-value">Total Damage (Motor Accident)</span>
+                  <span class="detail-value">${claim.claimType}</span>
                 </div>
                 <div class="detail-item">
                   <span class="detail-label">Details</span>
-                  <span class="detail-value">Collision while avoiding pedestrian</span>
+                  <span class="detail-value">${claim.claimDetails}</span>
                 </div>
                 <div class="detail-item">
                   <span class="detail-label">Evidence</span>
-                  <span class="detail-value">Photos, ₦2,000,000 Invoice, Police Report</span>
+                  <span class="detail-value">${claim.evidence.join(', ')}</span>
                 </div>
                 <div class="detail-item">
                   <span class="detail-label">Claim Amount</span>
-                  <span class="detail-value" style="color: var(--warning); font-weight: 600;">₦2,000,000</span>
+                  <span class="detail-value" style="color: var(--warning); font-weight: 600;">$${claim.claimAmount.toLocaleString()}</span>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- AI Analysis -->
           <div class="card">
             <div class="card-header">
               <div class="card-title">AI Analysis & Recommendations</div>
@@ -736,10 +1427,9 @@
               <div class="claim-details">
                 <div class="detail-item">
                   <span class="detail-label">Missing Fields</span>
-                  <span class="detail-value">phoneNumberOfInsured, extentOfLossOrDamage</span>
+                  <span class="detail-value">${claim.missingFields.join(', ') || 'None'}</span>
                 </div>
               </div>
-
               <div class="ai-recommendations">
                 <h4>
                   <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -748,290 +1438,393 @@
                   AI Recommendations
                 </h4>
                 <ul>
-                  <li>Escalate to Fraud Investigation Unit</li>
-                  <li>Request proof of payment for repairs</li>
-                  <li>Verify pricing with certified garage</li>
-                  <li>Contact claimant for missing documentation</li>
+                  ${claim.aiRecommendations.map(rec => `<li>${rec}</li>`).join('')}
                 </ul>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Right Panel - Intelligence & Actions -->
-        <div class="right-panel">
-          <!-- Fraud Score -->
+        <div id="claimAnalysisTab" class="tab-content hidden" role="tabpanel">
           <div class="card">
             <div class="card-header">
-              <div class="card-title">Fraud Risk Assessment</div>
-              <div class="card-subtitle">AI-powered fraud detection</div>
+              <div class="card-title">AI Risk Analysis</div>
             </div>
             <div class="card-content">
-              <div class="fraud-score-container">
-                <div class="fraud-score">
-                  <svg width="120" height="120">
-                    <circle class="bg" cx="60" cy="60" r="60"></circle>
-                    <circle class="progress" cx="60" cy="60" r="60"></circle>
-                  </svg>
-                  <span id="fraudPercent">0%</span>
+              <div class="claim-details">
+                <div class="detail-item">
+                  <span class="detail-label">Fraud Risk Score</span>
+                  <span class="detail-value" style="color: var(--${claim.confidenceScores.fraudDetection < 5 ? 'success' : claim.confidenceScores.fraudDetection > 10 ? 'warning' : 'danger'}); font-weight: 600;">${claim.confidenceScores.fraudDetection}%</span>
                 </div>
-                <div style="text-align: center; color: var(--danger); font-weight: 600;">HIGH RISK</div>
+                <div class="detail-item">
+                  <span class="detail-label">Repair Cost Validation Score</span>
+                  <span class="detail-value" style="color: var(--${claim.confidenceScores.repairCostEstimator > 80 ? 'success' : claim.confidenceScores.repairCostEstimator > 60 ? 'warning' : 'danger'}); font-weight: 600;">${claim.confidenceScores.repairCostEstimator}%</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Document Verification Score</span>
+                  <span class="detail-value" style="color: var(--${claim.confidenceScores.documentVerification > 80 ? 'success' : claim.confidenceScores.documentVerification > 60 ? 'warning' : 'danger'}); font-weight: 600;">${claim.confidenceScores.documentVerification}%</span>
+                </div>
               </div>
             </div>
           </div>
 
-          <!-- Suggested Settlement -->
           <div class="card">
             <div class="card-header">
               <div class="card-title">AI Settlement Recommendation</div>
             </div>
             <div class="card-content metric-card">
-              <div class="metric-value">₦1,500,000</div>
+              <div class="metric-value">₦${claim.suggestedSettlement.toLocaleString()}</div>
               <div class="metric-label">AI-adjusted from repair estimates</div>
               <div style="margin-top: 12px; font-size: 0.85rem; color: var(--text-muted);">
-                Original claim: ₦2,000,000<br>
-                Adjustment: -25% due to market pricing
+                Original claim: ₦${claim.claimAmount.toLocaleString()}<br>
+                Adjustment: ${Math.round(((claim.suggestedSettlement - claim.claimAmount) / claim.claimAmount) * 100)}% due to market pricing
               </div>
             </div>
           </div>
 
-          <!-- AI Confidence -->
-          <div class="card">
-            <div class="card-header">
-              <div class="card-title">AI Model Confidence</div>
-            </div>
-            <div class="card-content">
-              <div class="claim-details">
-                <div class="detail-item">
-                  <span class="detail-label">Fraud Detection Model</span>
-                  <span class="detail-value" style="color: var(--danger); font-weight: 600;">88%</span>
-                </div>
-                <div class="detail-item">
-                  <span class="detail-label">Repair Cost Estimator</span>
-                  <span class="detail-value" style="color: var(--success); font-weight: 600;">92%</span>
-                </div>
-                <div class="detail-item">
-                  <span class="detail-label">Document Verification</span>
-                  <span class="detail-value" style="color: var(--warning); font-weight: 600;">76%</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Timeline -->
           <div class="card">
             <div class="card-header">
               <div class="card-title">Claim Timeline</div>
             </div>
             <div class="card-content">
               <ul class="timeline">
-                <li>
-                  <span class="timeline-icon">📩</span>
-                  <span>Claim Submitted</span>
-                </li>
-                <li>
-                  <span class="timeline-icon">🤖</span>
-                  <span>AI Triage Complete</span>
-                </li>
-                <li>
-                  <span class="timeline-icon">⚠️</span>
-                  <span>Escalation Flagged</span>
-                </li>
-                <li>
-                  <span class="timeline-icon">👁️</span>
-                  <span>Under Review</span>
-                </li>
+                ${claim.timeline.map((item, index) => `
+                  <li class="${index === claim.timeline.length - 1 ? 'current' : ''}">
+                    <span class="timeline-icon">${this.getTimelineIcon(item.action)}</span>
+                    <span>${this.getTimelineText(item.action)} - ${new Date(item.timestamp).toLocaleString()}</span>
+                  </li>
+                `).join('')}
               </ul>
             </div>
           </div>
+        </div>
+      </div>
 
-          <!-- Actions -->
-          <div class="card">
-            <div class="card-header">
-              <div class="card-title">Actions</div>
-              <div class="card-subtitle">Review and process claim</div>
-            </div>
-            <div class="card-content">
-              <div class="actions">
-                <button class="btn btn-approve" onclick="handleAction('approve')">
-                  <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right: 4px;">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                  </svg>
-                  Approve
-                </button>
-                <button class="btn btn-escalate" onclick="handleAction('escalate')">
-                  <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right: 4px;">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                  </svg>
-                  Escalate
-                </button>
-                <button class="btn btn-reject" onclick="handleAction('reject')">
-                  <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right: 4px;">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                  </svg>
-                  Reject
-                </button>
+      <div class="right-panel">
+        <!-- NEW: Claim Status Section -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">AI Claim Processing Status</div>
+            <div class="card-subtitle">Current processing state</div>
+          </div>
+          <div class="card-content">
+            <div class="status-display" style="text-align: center; padding: 20px;">
+              <div class="status-icon" style="font-size: 2rem; margin-bottom: 12px;">
+                ${this.getStatusIcon(claim.status)}
               </div>
-              <div style="margin-top: 12px; text-align: center; font-size: 0.8rem; color: var(--text-muted);">
-                All actions are logged and auditable
+              <div class="status-text" style="font-size: 1.2rem; font-weight: 600; margin-bottom: 8px;">
+                ${claim.status.replace('_', ' ').toUpperCase()}
+              </div>
+              <div class="status-description" style="font-size: 0.9rem; color: var(--text-muted);">
+                ${this.getStatusDescription(claim.status)}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Actions</div>
+            <div class="card-subtitle">Review and process claim</div>
+          </div>
+          <div class="card-content">
+            <div class="actions">
+              <button class="btn btn-approve" onclick="portal.handleAction('${claim.id}', 'approved')" ${isActionDisabled ? 'disabled' : ''}>
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right: 4px;">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                Approve
+              </button>
+              <button class="btn btn-escalate" onclick="portal.handleAction('${claim.id}', 'escalated')" ${isActionDisabled ? 'disabled' : ''}>
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right: 4px;">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+                Escalate
+              </button>
+              <button class="btn btn-reject" onclick="portal.handleAction('${claim.id}', 'rejected')" ${isActionDisabled ? 'disabled' : ''}>
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right: 4px;">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+                Reject
+              </button>
+            </div>
+            <div style="margin-top: 12px; text-align: center; font-size: 0.8rem; color: var(--text-muted);">
+              ${isActionDisabled ? 'This claim has been processed' : 'All actions are logged and auditable'}
+            </div>
+          </div>
+        </div>
+
+        <!-- Fraud Score -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Fraud Risk Assessment</div>
+            <div class="card-subtitle">AI-powered fraud detection</div>
+          </div>
+          <div class="card-content">
+            <div class="fraud-score-container">
+              <div class="fraud-score">
+               <svg width="140" height="140">
+                 <circle class="bg" cx="70" cy="70" r="66"></circle>
+                 <circle class="progress" cx="70" cy="70" r="66" id="fraudCircle"></circle>
+               </svg>
+                <span id="fraudPercent">${claim.fraudScore}%</span>
+              </div>
+              <div style="text-align: center; color: ${claim.fraudScore > 70 ? 'var(--danger)' : claim.fraudScore > 40 ? 'var(--warning)' : 'var(--success)'}; font-weight: 600;">
+                ${claim.fraudScore > 70 ? 'HIGH RISK' : claim.fraudScore > 40 ? 'MEDIUM RISK' : 'LOW RISK'}
               </div>
             </div>
           </div>
         </div>
       </div>
-    </main>
-  </div>
+    </div>
+  `;
+  
+  // Animate fraud score after render
+  setTimeout(() => {
+    this.animateFraudScore(claim.fraudScore);
+  }, 100);
+}
 
-  <script>
-    // Animate fraud score
-    const fraudScore = 72; // %
-    const circle = document.querySelector('.progress');
-    const percentText = document.getElementById('fraudPercent');
-    const radius = circle.r.baseVal.value;
-    const circumference = 2 * Math.PI * radius;
+// Add these helper methods to the ClaimPortal class
+getStatusIcon(status) {
+  const icons = {
+    'pending': '⏳',
+    'under_review': '🔍',
+    'flagged': '🚩',
+    'approved': '✅',
+    'rejected': '❌',
+    'escalated': '🚨'
+  };
+  return icons[status] || '📋';
+}
 
-    circle.style.strokeDasharray = circumference;
-    circle.style.strokeDashoffset = circumference;
+getStatusDescription(status) {
+  const descriptions = {
+    'pending': 'Claim is waiting for initial review',
+    'under_review': 'Currently being analyzed by AI and human reviewers',
+    'flagged': 'Potential issues detected, requiring senior review',
+    'approve': 'Approve this claim for settlement',
+    'reject': 'Claim has been rejected due to policy violations',
+    'escalate': 'Escalated to fraud investigation unit'
+  };
+  return descriptions[status] || 'Status unknown';
+}
+      animateFraudScore(score) {
+        const circle = document.getElementById('fraudCircle');
+        const percentText = document.getElementById('fraudPercent');
+        
+        if (!circle || !percentText) return;
+        
+        const radius = circle.r.baseVal.value;
+        const circumference = 2 * Math.PI * radius;
 
-    // Animate on load
-    setTimeout(() => {
-      let progress = 0;
-      const animate = setInterval(() => {
-        if (progress >= fraudScore) {
-          clearInterval(animate);
-          return;
+        circle.style.strokeDasharray = circumference;
+        circle.style.strokeDashoffset = circumference;
+
+        // Set color based on score
+        const color = score > 70 ? 'var(--danger)' : score > 40 ? 'var(--warning)' : 'var(--success)';
+        circle.style.stroke = color;
+        percentText.style.color = color;
+
+        // Animate
+        let progress = 0;
+        const animate = setInterval(() => {
+          if (progress >= score) {
+            clearInterval(animate);
+            return;
+          }
+          percentText.textContent = progress + "%";
+          const offset = circumference - (progress / 100) * circumference;
+          circle.style.strokeDashoffset = offset;
+          progress++;
+        }, 20);
+      }
+
+      getTimelineIcon(action) {
+        const icons = {
+          'submitted': '📩',
+          'ai_triage': '🤖',
+          'escalation_flagged': '⚠️',
+          'under_review': '👁️',
+          'approved': '✅',
+          'rejected': '❌',
+          'escalated': '🚨'
+        };
+        return icons[action] || '📋';
+      }
+
+      getTimelineText(action) {
+        const texts = {
+          'submitted': 'Claim Submitted',
+          'ai_triage': 'AI Triage Complete',
+          'escalation_flagged': 'Escalation Flagged',
+          'under_review': 'Under Review',
+          'approved': 'Claim Approved',
+          'rejected': 'Claim Rejected',
+          'escalated': 'Escalated to Investigation'
+        };
+        return texts[action] || action.replace('_', ' ').toUpperCase();
+      }
+
+      async handleAction(claimId, newStatus) {
+        const messages = {
+          approved: `Claim approved for ₦${this.currentClaim.suggestedSettlement.toLocaleString()}. Settlement will be processed within 2-3 business days.`,
+          escalated: 'Claim escalated to Fraud Investigation Unit. Senior analyst will review within 24 hours.',
+          rejected: 'Claim rejected due to insufficient documentation. Claimant will be notified with required documents.'
+        };
+
+        const colors = {
+          approved: 'var(--success)',
+          escalated: 'var(--warning)',
+          rejected: 'var(--danger)'
+        };
+
+        // Show confirmation
+        const confirmed = confirm(`Are you sure you want to ${newStatus.replace('ed', 'e')} this claim?\n\n${messages[newStatus]}`);
+        
+        if (!confirmed) return;
+
+        try {
+          // Show loading state on buttons
+          const actionButtons = document.querySelectorAll('.actions .btn');
+          actionButtons.forEach(btn => {
+            btn.disabled = true;
+            btn.style.opacity = '0.5';
+          });
+
+          const response = await this.updateClaimStatus(claimId, newStatus);
+          
+          if (response.success) {
+            // Update current claim
+            this.currentClaim.status = newStatus;
+            
+            // Show success notification
+            this.showNotification(`Claim ${newStatus} successfully!`, colors[newStatus]);
+            
+            // Reload claim details to show updated state
+            await this.loadClaimDetails(claimId);
+            
+            // Update navigation counters
+            this.updateNavigationCounters();
+            
+          } else {
+            throw new Error(response.error);
+          }
+        } catch (error) {
+          console.error('Error updating claim:', error);
+          this.showNotification('Error updating claim. Please try again.', 'var(--danger)');
+          
+          // Re-enable buttons
+          const actionButtons = document.querySelectorAll('.actions .btn');
+          actionButtons.forEach(btn => {
+            btn.disabled = false;
+            btn.style.opacity = '1';
+          });
         }
-        percentText.textContent = progress + "%";
-        const offset = circumference - (progress / 100) * circumference;
-        circle.style.strokeDashoffset = offset;
-        progress++;
-      }, 20);
-    }, 500);
+      }
 
-    // Handle action buttons
-    function handleAction(action) {
-      const messages = {
-        approve: 'Claim approved for ₦1,500,000. Settlement will be processed within 2-3 business days.',
-        escalate: 'Claim escalated to Fraud Investigation Unit. Senior analyst will review within 24 hours.',
-        reject: 'Claim rejected due to insufficient documentation. Claimant will be notified with required documents.'
-      };
-
-      const colors = {
-        approve: 'var(--success)',
-        escalate: 'var(--warning)',
-        reject: 'var(--danger)'
-      };
-
-      // Show confirmation
-      const confirmed = confirm(`Are you sure you want to ${action} this claim?\n\n${messages[action]}`);
-      
-      if (confirmed) {
-        // Create notification
-        showNotification(`Claim ${action}d successfully!`, colors[action]);
+      handleSearch(query) {
+        if (!query.trim()) return;
         
-        // Update UI to reflect action
-        const statusBadge = document.querySelector('.status-badge');
-        statusBadge.textContent = action === 'approve' ? 'Approved' : 
-                                 action === 'escalate' ? 'Escalated' : 'Rejected';
-        statusBadge.className = `status-badge status-${action === 'approve' ? 'approved' : 
-                                                     action === 'escalate' ? 'pending' : 'flagged'}`;
+        const claimsArray = Array.from(this.claims.values());
+        const filteredClaims = claimsArray.filter(claim => 
+          claim.id.toLowerCase().includes(query.toLowerCase()) ||
+          claim.claimantName.toLowerCase().includes(query.toLowerCase()) ||
+          claim.policyNumber.toLowerCase().includes(query.toLowerCase()) ||
+          claim.carRegistration.toLowerCase().includes(query.toLowerCase())
+        );
+
+        // Show search results
+        console.log('Search results:', filteredClaims);
+        // In a real implementation, you'd update the UI to show search results
+      }
+
+      showNoClaims() {
+        const mainContent = document.getElementById('mainContent');
+        mainContent.innerHTML = `
+          <div class="no-claim">
+            <div class="no-claim-icon">📋</div>
+            <h2>No Claims Available</h2>
+            <p>Waiting for new claim submissions...</p>
+          </div>
+        `;
+      }
+
+      showNotification(message, color = 'var(--primary)', duration = 3000) {
+        const notification = document.createElement('div');
+        notification.style.cssText = `
+          position: fixed;
+          top: 20px;
+          right: 20px;
+          background: ${color};
+          color: white;
+          padding: 12px 20px;
+          border-radius: 8px;
+          font-weight: 600;
+          box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+          z-index: 10000;
+          transform: translateX(400px);
+          transition: transform 0.3s ease;
+          max-width: 400px;
+        `;
+        notification.textContent = message;
         
-        // Disable action buttons
-        const actionButtons = document.querySelectorAll('.actions .btn');
-        actionButtons.forEach(btn => {
-          btn.disabled = true;
-          btn.style.opacity = '0.5';
-          btn.style.cursor = 'not-allowed';
-        });
+        document.body.appendChild(notification);
+        
+        // Animate in
+        setTimeout(() => {
+          notification.style.transform = 'translateX(0)';
+        }, 100);
+        
+        // Remove after duration
+        setTimeout(() => {
+          notification.style.transform = 'translateX(400px)';
+          setTimeout(() => {
+            if (document.body.contains(notification)) {
+              document.body.removeChild(notification);
+            }
+          }, 300);
+        }, duration);
+      }
+
+      delay(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+      }
+
+      // Cleanup method
+      destroy() {
+        if (this.pollingInterval) {
+          clearInterval(this.pollingInterval);
+        }
       }
     }
 
-    // Show notification
-    function showNotification(message, color) {
-      const notification = document.createElement('div');
-      notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: ${color};
-        color: white;
-        padding: 12px 20px;
-        border-radius: 8px;
-        font-weight: 600;
-        box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-        z-index: 10000;
-        transform: translateX(400px);
-        transition: transform 0.3s ease;
-      `;
-      notification.textContent = message;
-      
-      document.body.appendChild(notification);
-      
-      // Animate in
-      setTimeout(() => {
-        notification.style.transform = 'translateX(0)';
-      }, 100);
-      
-      // Remove after 3 seconds
-      setTimeout(() => {
-        notification.style.transform = 'translateX(400px)';
-        setTimeout(() => document.body.removeChild(notification), 300);
-      }, 3000);
-    }
+    // Initialize the portal
+    const portal = new ClaimPortal();
 
-    // Mobile sidebar toggle (for responsive)
-    function toggleSidebar() {
-      document.querySelector('.sidebar').classList.toggle('open');
-    }
-
-    // Search functionality
-    document.querySelector('.search-box input').addEventListener('input', function(e) {
-      const query = e.target.value.toLowerCase();
-      // In a real app, this would filter claims/policies/customers
-      console.log('Searching for:', query);
+    // Global event handlers for cleanup
+    window.addEventListener('beforeunload', () => {
+      portal.destroy();
     });
 
-    // Add some interactive hover effects
-    document.addEventListener('DOMContentLoaded', function() {
-      // Add hover effects to nav items
-      const navItems = document.querySelectorAll('.nav-item');
-      navItems.forEach(item => {
-        item.addEventListener('mouseenter', function() {
-          if (!this.classList.contains('active')) {
-            this.style.transform = 'translateX(4px)';
-          }
-        });
-        
-        item.addEventListener('mouseleave', function() {
-          if (!this.classList.contains('active')) {
-            this.style.transform = 'translateX(0)';
-          }
-        });
-      });
+    // // Handle visibility changes to optimize polling
+    // document.addEventListener('visibilitychange', () => {
+    //   if (document.hidden) {
+    //     // Reduce polling frequency when tab is not visible
+    //     if (portal.pollingInterval) {
+    //       clearInterval(portal.pollingInterval);
+    //       portal.pollingInterval = setInterval(async () => {
+    //         await portal.checkForUpdates();
+    //       }, 3000000000); // Poll every 30 seconds when hidden
+    //     }
+    //   } else {
+    //     // Resume normal polling when tab becomes visible
+    //     portal.startPolling();
+    //   }
+    // });
 
-      // Add pulse animation to notification badges
-      const badges = document.querySelectorAll('.nav-badge, .notification-badge');
-      badges.forEach(badge => {
-        setInterval(() => {
-          badge.style.animation = 'pulse 1.5s ease-in-out';
-          setTimeout(() => badge.style.animation = '', 1500);
-        }, 5000);
-      });
-    });
-
-    // Add pulse keyframe animation via CSS
-    const style = document.createElement('style');
-    style.textContent = `
-      @keyframes pulse {
-        0%, 100% { transform: scale(1); }
-        50% { transform: scale(1.1); }
-      }
-      
-      .nav-item {
-        transition: transform 0.2s ease;
-      }
-    `;
-    document.head.appendChild(style);
+    // Expose portal for debugging
+    window.portal = portal;
   </script>
 </body>
 </html>

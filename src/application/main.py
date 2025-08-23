@@ -1,7 +1,8 @@
 # Import necessary modules
+
+import os, secrets, uvicorn
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-import os, secrets, uvicorn
 from fastapi import FastAPI, Request, Depends, HTTPException
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.middleware.cors import CORSMiddleware
