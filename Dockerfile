@@ -22,7 +22,7 @@ COPY pyproject.toml poetry.lock* /app/
 # - No virtualenvs inside the docker container
 # - Do not ask any interactive questions
 RUN poetry config virtualenvs.create false \
-    && poetry install --only main --no-interaction --no-ansi
+    && poetry install --only main --no-interaction --no-ansi --no-root
 
 # Install dependencies
 # RUN pip install --no-cache-dir -r requirements.txt
