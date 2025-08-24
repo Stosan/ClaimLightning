@@ -36,11 +36,11 @@ async def lifespan(app: FastAPI):
     print(running_mode)
     print()
     print()
-    printer(" ⚡️🚀 Reinsurance AI Server::Started", "sky_blue")
+    printer(" ⚡️🚀 ClaimLightning AI Server::Started", "sky_blue")
     print()
-    printer(" ⚡️🏎  Reinsurance AI Server::Running", "sky_blue")
+    printer(" ⚡️🏎  ClaimLightning AI Server::Running", "sky_blue")
     yield
-    printer(" 🔴 Reinsurance AI Server::SHUTDOWN", "red")
+    printer(" 🔴 ClaimLightning AI Server::SHUTDOWN", "red")
 
 # Adjust dependency to use warmed db_client
 def get_db_client(settings: Settings = Depends(get_settings)):
