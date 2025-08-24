@@ -14,14 +14,14 @@ def generate_mock_claims_list():
     num_claims = 1
     
     for i in range(num_claims):
-        claim_id = f"CL{str(123456 + i).zfill(6)}"
+        claim_id = "cl-123223"
         is_new = random.random() < 0.05  # 5% chance of being new
         
         claims.append({
             'id': claim_id,
             'claimantName': random.choice(names),
             'policyNumber': claim_id,
-            'carRegistration': f"ABC{random.randint(100, 999)}XZ",
+            'carRegistration': "2930-393",
             'status': 'pending' if is_new else random.choice(statuses),
             'claimType': random.choice(claim_types),
             'claimAmount': 1638.25,
