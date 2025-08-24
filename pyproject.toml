@@ -14,7 +14,8 @@ dependencies = [
     "aiofiles (>=24.1.0,<25.0.0)",
     "python-multipart (>=0.0.20,<0.0.21)",
     "python-dotenv (>=1.1.1,<2.0.0)",
-    "openai (>=1.101.0,<2.0.0)"
+    "openai (>=1.101.0,<2.0.0)",
+    "pydantic-settings (>=2.10.1,<3.0.0)"
     
 ]
 
